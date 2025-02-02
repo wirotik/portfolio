@@ -3,54 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Montage Vidéo</title>
+  <title>Montages Vidéo</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <nav>
       <ul>
-        <li><a href="index.html">Retour au Portfolio</a></li>
+        <li><a href="index.html" class="nav-link">Retour au Portfolio</a></li>
       </ul>
     </nav>
   </header>
 
   <section>
-    <h2>Montage Vidéo Type</h2>
-    <p>Voici quelques exemples de vidéos que j'ai montées</p>
-
+    <h2>Montages Vidéo</h2>
+    <p>Voici quelques vidéos de montages réalisés. Utilisez les flèches pour naviguer entre les vidéos.</p>
+    
     <div class="video-slider">
-      <button class="arrow left" onclick="changeVideo(-1)">&#10094;</button>
-      <iframe id="project-video" width="560" height="315" 
-              src="https://www.youtube.com/embed/JuNok98Znm8" 
-              title="Vidéo de montage" frameborder="0" allowfullscreen></iframe>
-      <button class="arrow right" onclick="changeVideo(1)">&#10095;</button>
+      <button class="arrow left" onclick="changeVideo(-1)" aria-label="Précédente">&#10094;</button>
+      <iframe id="project-video" width="560" height="315" src="https://www.youtube.com/embed/JuNok98Znm8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <button class="arrow right" onclick="changeVideo(1)" aria-label="Suivante">&#10095;</button>
     </div>
-
   </section>
 
   <footer>
     <p>&copy; 2025 Wirotik | Tous droits réservés</p>
   </footer>
 
-  <script>
-    let currentVideoIndex = 0;
-    const videos = [
-      'https://www.youtube.com/embed/JuNok98Znm8', // Ta vidéo principale
-      'https://www.youtube.com/embed/Aar6Vai_Vwg',
-      'https://www.youtube.com/embed/goAw0oQG-U4', // Exemple vidéo 2
-                
-    ];
-
-    function changeVideo(direction) {
-      currentVideoIndex += direction;
-      if (currentVideoIndex < 0) {
-        currentVideoIndex = videos.length - 1;
-      } else if (currentVideoIndex >= videos.length) {
-        currentVideoIndex = 0;
-      }
-      document.getElementById('project-video').src = videos[currentVideoIndex];
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
