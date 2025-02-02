@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Montage Vidéo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Retour au Portfolio</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section>
+    <h2>Montage Vidéo Type</h2>
+    <p>Voici quelques exemples de vidéos que j'ai montées</p>
+
+    <div class="video-slider">
+      <button class="arrow left" onclick="changeVideo(-1)">&#10094;</button>
+      <iframe id="project-video" width="560" height="315" 
+              src="https://www.youtube.com/embed/JuNok98Znm8" 
+              title="Vidéo de montage" frameborder="0" allowfullscreen></iframe>
+      <button class="arrow right" onclick="changeVideo(1)">&#10095;</button>
+    </div>
+
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Wirotik | Tous droits réservés</p>
+  </footer>
+
+  <script>
+    let currentVideoIndex = 0;
+    const videos = [
+      'https://www.youtube.com/embed/JuNok98Znm8', // Ta vidéo principale
+      'https://www.youtube.com/embed/Aar6Vai_Vwg',
+      'https://www.youtube.com/embed/goAw0oQG-U4', // Exemple vidéo 2
+                
+    ];
+
+    function changeVideo(direction) {
+      currentVideoIndex += direction;
+      if (currentVideoIndex < 0) {
+        currentVideoIndex = videos.length - 1;
+      } else if (currentVideoIndex >= videos.length) {
+        currentVideoIndex = 0;
+      }
+      document.getElementById('project-video').src = videos[currentVideoIndex];
+    }
+  </script>
+</body>
+</html>
