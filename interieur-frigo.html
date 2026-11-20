@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'intérieur du frigo — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-hand:'Caveat',cursive;
+  --font-title:'Dancing Script',cursive;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-hand);overflow-x:hidden;background:#b9c9d2;color:#243746}
+
+/* ===== INTÉRIEUR DU FRIGO ===== */
+.interieur{
+  position:relative;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 70% 30% at 50% -8%,rgba(255,255,255,.98),rgba(255,255,255,0) 70%),
+    linear-gradient(90deg,#9fb2be 0%,#dce9ef 7%,#f6fbfd 28%,#f9fcfd 72%,#dbe8ee 93%,#9aadba 100%);
+  box-shadow:inset 0 0 140px rgba(25,55,75,.38),inset 0 -60px 90px rgba(30,60,80,.18);
+}
+/* parois latérales */
+.interieur::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(20,45,65,.28),transparent 5%,transparent 95%,rgba(20,45,65,.28)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px);
+  mix-blend-mode:multiply;opacity:.5;
+}
+/* grain */
+.interieur::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:var(--noise);background-size:200px;
+  opacity:.045;mix-blend-mode:multiply;
+}
+/* plaque LED en haut */
+.led{
+  position:sticky;top:0;z-index:20;
+  height:22px;
+  background:linear-gradient(180deg,#ffffff,#dcecf4);
+  box-shadow:0 6px 26px rgba(255,255,255,.95),0 10px 30px rgba(90,130,150,.25);
+}
+.led::after{
+  content:"";position:absolute;left:8%;right:8%;bottom:-6px;height:8px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.9),transparent 70%);
+}
+/* étagères en verre */
+.shelf-line{
+  position:relative;height:16px;margin:0 4%;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(165,190,205,.65));
+  border-radius:3px;
+  box-shadow:0 10px 18px rgba(35,70,90,.18),inset 0 -3px 4px rgba(70,100,120,.2);
+}
+.shelf-line::before{
+  content:"";position:absolute;left:3%;right:3%;top:16px;height:10px;
+  background:linear-gradient(180deg,rgba(80,115,135,.16),transparent);
+}
+.grid .shelf-line{
+  grid-column:1 / -1;margin:0;
+  height:118px;background:transparent;box-shadow:none;
+}
+.grid .shelf-line::before{
+  top:auto;bottom:0;height:16px;border-radius:3px;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(165,190,205,.7));
+  box-shadow:0 10px 18px rgba(35,70,90,.18),inset 0 -3px 4px rgba(70,100,120,.2);
+}
+.grid .shelf-line::after{
+  content:"";position:absolute;left:3%;right:3%;bottom:-10px;height:10px;
+  background:linear-gradient(180deg,rgba(80,115,135,.16),transparent);
+}
+/* aliments posés sur l'étagère */
+.food-row{
+  position:absolute;left:5%;right:5%;bottom:16px;height:112px;
+  display:flex;align-items:flex-end;justify-content:space-around;
+  gap:1.2vw;pointer-events:none;z-index:2;
+}
+.food-row .food{
+  display:block;width:auto;max-width:22%;object-fit:contain;
+  filter:drop-shadow(3px 5px 4px rgba(30,55,70,.28));
+  transform-origin:bottom center;
+}
+.food-row .food:nth-child(odd){transform:rotate(-2deg)}
+.food-row .food:nth-child(even){transform:rotate(2deg)}
+
+/* ===== EN-TÊTE ===== */
+header{
+  position:relative;z-index:5;
+  text-align:center;padding:34px 20px 18px;
+}
+header h1{
+  font-family:var(--font-title);font-size:clamp(40px,6vw,76px);
+  font-weight:700;color:#2b4a5c;
+  text-shadow:0 2px 0 rgba(255,255,255,.9);
+}
+header p{font-size:clamp(20px,2.4vw,28px);color:#557184;margin-top:2px}
+.back{
+  position:absolute;left:3vw;top:38px;z-index:30;
+  display:inline-block;
+  font-family:var(--font-title);font-size:22px;font-weight:700;
+  color:#fff;text-decoration:none;
+  padding:8px 18px;border-radius:30px;
+  background:linear-gradient(180deg,#7fa8bd,#4d7e96);
+  box-shadow:0 6px 14px rgba(30,60,80,.3),inset 0 1px 0 rgba(255,255,255,.6);
+  transition:transform .2s,box-shadow .2s;
+}
+.back:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(30,60,80,.4)}
+
+/* ===== PROJETS ===== */
+.grid{
+  position:relative;z-index:5;
+  display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));
+  gap:28px;padding:34px max(4vw,24px) 70px;
+  max-width:1300px;margin:0 auto;
+}
+.project{
+  position:relative;cursor:pointer;overflow:hidden;
+  border-radius:14px;
+  background:linear-gradient(180deg,#ffffff,#eef5f8);
+  border:1px solid rgba(255,255,255,.95);
+  box-shadow:0 14px 26px rgba(25,60,80,.22),inset 0 1px 0 #fff;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1.3),box-shadow .3s;
+}
+.project:hover{
+  transform:translateY(-9px) rotate(-1.2deg);
+  box-shadow:0 24px 40px rgba(25,60,80,.32),inset 0 1px 0 #fff;
+}
+.thumb{
+  height:140px;display:flex;align-items:center;justify-content:center;
+  font-size:58px;position:relative;
+  background:var(--g);
+}
+.thumb::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.7),transparent 55%);
+}
+.thumb::after{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.08) 0 8px,transparent 8px 16px);
+  mix-blend-mode:overlay;
+}
+.thumb span{position:relative;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2))}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.body{padding:14px 17px 20px}
+.body h3{
+  font-family:var(--font-title);font-size:26px;font-weight:700;
+  color:#2b4a5c;margin-bottom:4px;
+}
+.body p{font-size:19px;line-height:1.16;color:#4d6675}
+.tag{
+  display:inline-block;margin-top:9px;margin-right:5px;
+  font-family:var(--font-title);font-size:13px;font-weight:700;
+  padding:2px 9px;border-radius:20px;
+  background:rgba(90,140,165,.14);border:1px solid rgba(70,120,145,.25);
+  color:#3f6a80;
+}
+.open-ico{
+  position:absolute;right:12px;top:12px;z-index:2;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.75);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:#3f6a80;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+
+/* ===== MODALE ===== */
+.overlay{
+  position:fixed;inset:0;z-index:100;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(18,36,48,.78);backdrop-filter:blur(5px);
+}
+.overlay.show{display:flex;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{
+  position:relative;width:min(96vw,1080px);max-height:94vh;overflow:auto;
+  border-radius:16px;background:linear-gradient(180deg,#fff,#edf5f9);
+  box-shadow:0 30px 70px rgba(0,0,0,.5);
+  animation:pop .35s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes pop{from{transform:scale(.88) rotate(2deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+/* galerie d'images dans la fenêtre projet */
+.gallery{position:relative;height:min(64vh,600px);overflow:hidden;background:#e8f1f5}
+.gallery img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2}
+.gallery-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:46px;height:46px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.86);color:#2b4a5c;
+  font-size:32px;line-height:1;cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+  transition:background .2s,box-shadow .2s,transform .2s;
+}
+.gallery-nav:hover{background:#fff;box-shadow:0 0 0 4px rgba(217,180,106,.55),0 6px 16px rgba(0,0,0,.35)}
+.gallery-nav.prev{left:14px}
+.gallery-nav.next{right:14px}
+.gallery-count{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:5;
+  background:rgba(20,40,55,.65);color:#fff;
+  padding:2px 12px;border-radius:20px;font-size:16px;letter-spacing:.05em;
+}
+
+/* ===== INTERFACE ADMIN ===== */
+.admin-lock{
+  position:fixed;right:18px;top:16px;z-index:70;
+  width:38px;height:38px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.9);color:#2b4a5c;
+  font-size:18px;cursor:pointer;
+  box-shadow:0 5px 14px rgba(20,50,70,.3);
+  transition:transform .2s,box-shadow .2s;
+}
+.admin-lock:hover{transform:scale(1.1);box-shadow:0 8px 20px rgba(20,50,70,.4)}
+.admin-lock.unlocked{background:linear-gradient(180deg,#8fd0a8,#4e9b70);color:#fff}
+.admin-bar{
+  position:fixed;right:18px;top:62px;z-index:69;
+  display:none;flex-direction:column;gap:8px;
+  padding:10px;border-radius:12px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 10px 26px rgba(20,50,70,.3);
+}
+.admin-bar.show{display:flex}
+.admin-bar button{
+  font-family:var(--font-title);font-size:17px;font-weight:700;
+  padding:7px 14px;border:none;border-radius:8px;cursor:pointer;
+  background:linear-gradient(180deg,#7fa8bd,#4d7e96);color:#fff;
+  transition:transform .2s;
+}
+.admin-bar button:hover{transform:translateY(-2px)}
+.card-delete{
+  position:absolute;left:10px;top:10px;z-index:7;
+  width:28px;height:28px;border:none;border-radius:50%;
+  background:rgba(200,60,50,.92);color:#fff;font-size:16px;cursor:pointer;
+  display:none;box-shadow:0 3px 8px rgba(0,0,0,.3);
+}
+body.admin-mode .card-delete{display:block}
+.admin-sheet{width:min(94vw,600px)}
+.admin-sheet .body{padding:22px 28px 30px}
+.admin-sheet label{
+  display:block;font-family:var(--font-title);font-size:20px;font-weight:700;
+  color:#2b4a5c;margin:12px 0 4px;
+}
+.admin-sheet input[type=text],.admin-sheet textarea{
+  width:100%;padding:9px 11px;border-radius:8px;
+  border:1px solid rgba(60,100,125,.35);
+  font-family:var(--font-hand);font-size:20px;color:#243746;
+  background:rgba(255,255,255,.85);resize:vertical;
+}
+.admin-sheet textarea{min-height:70px}
+.admin-sheet .btn{
+  margin-top:16px;font-family:var(--font-title);font-size:20px;font-weight:700;
+  padding:8px 20px;border:none;border-radius:10px;cursor:pointer;
+  background:linear-gradient(180deg,#7fc49a,#45946c);color:#fff;
+}
+.admin-sheet .btn:hover{filter:brightness(1.08)}
+.sheet .body{padding:18px 30px 26px}
+.sheet h2{font-family:var(--font-title);font-size:42px;color:#2b4a5c;font-weight:700}
+.sheet p{font-size:24px;line-height:1.2;color:#3f5d6d;margin-top:8px}
+.sheet .tag{font-size:15px;margin-top:12px}
+.close{
+  position:absolute;right:14px;top:14px;z-index:5;
+  width:38px;height:38px;border:none;border-radius:50%;
+  background:linear-gradient(180deg,#ef7b6b,#c34a3c);color:#fff;
+  font-size:22px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.3);
+}
+.lien{
+  display:inline-block;margin-top:18px;
+  font-family:var(--font-title);font-size:20px;font-weight:700;
+  color:#3f6a80;text-decoration:none;border-bottom:2px solid rgba(63,106,128,.5);
+}
+
+@media(max-width:600px){
+  .back{top:12px;left:12px;font-size:18px;padding:6px 12px}
+  header{padding-top:72px}
+  .grid{gap:18px;padding:24px 16px 50px}
+  .thumb{height:120px;font-size:48px}
+}
+</style>
+</head>
+<body>
+<div class="interieur">
+  <div class="led"></div>
+
+  <a class="back" href="portfolio-frigo.html">← Retour au frigo</a>
+
+  <header>
+    <h1>L'intérieur du frigo</h1>
+    <p>Fraîchement rangé... clique sur un projet pour le sortir ! 🧊</p>
+  </header>
+
+  <div class="shelf-line"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="shelf-line"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <button class="close" data-close>✕</button>
+    <div class="gallery">
+      <img id="mImg" src="" alt="">
+      <button class="gallery-nav prev" id="gPrev" aria-label="Image précédente">‹</button>
+      <button class="gallery-nav next" id="gNext" aria-label="Image suivante">›</button>
+      <div class="gallery-count" id="gCount"></div>
+    </div>
+    <div class="body">
+      <h2 id="mTitle"></h2>
+      <p id="mDesc"></p>
+      <div id="mTags"></div>
+      <a class="lien" href="https://github.com" target="_blank" rel="noopener">→ voir le code sur GitHub</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="overlay" id="loginOverlay">
+  <div class="sheet admin-sheet">
+    <button class="close" data-close>✕</button>
+    <div class="body">
+      <h2>Accès admin 🔒</h2>
+      <label>Code d'accès</label>
+      <input type="text" id="adminCode" placeholder="chaos2009@">
+      <label>Token GitHub (une seule fois)</label>
+      <input type="password" id="adminToken" placeholder="ghp_... ou token fine-grained">
+      <p style="font-size:16px;color:#557184;margin-top:8px">Le token sert à enregistrer les projets dans le dépôt. Il reste dans cet onglet uniquement.</p>
+      <button class="btn" id="adminLogin">Connexion</button>
+    </div>
+  </div>
+</div>
+
+<button class="admin-lock" id="adminLock" title="Espace admin">🔒</button>
+<div class="admin-bar" id="adminBar">
+  <button id="adminAdd">+ Ajouter un projet</button>
+  <button id="adminLogout">Se déconnecter</button>
+</div>
+
+<div class="overlay" id="adminOverlay">
+  <div class="sheet admin-sheet">
+    <button class="close" data-close>✕</button>
+    <div class="body">
+      <h2 id="adminTitle">Ajouter un projet</h2>
+      <label>Nom du projet</label>
+      <input type="text" id="fNom" placeholder="Mon super projet">
+      <label>Description courte</label>
+      <textarea id="fDesc" placeholder="Ce que fait le projet..."></textarea>
+      <label>Image vitrine (chemin)</label>
+      <input type="text" id="fCover" placeholder="projets/mon-projet.png">
+      <label>Photos de la galerie (chemins séparés par une virgule)</label>
+      <input type="text" id="fImgs" placeholder="projets/p1.png, projets/p2.png">
+      <label>Technologies (séparées par une virgule)</label>
+      <input type="text" id="fTags" placeholder="React, Node, CSS">
+      <button class="btn" id="adminSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DONNÉES PARTAGÉES
+   Sur GitHub Pages, le dépôt est détecté automatiquement et les
+   projets sont lus/écrits dans projets.json grâce à l'API GitHub.
+   En local (file://), on retombe sur le fichier projets.json à côté.
+   ============================================================ */
+const GITHUB = (function(){
+  const h = location.hostname;
+  if (h.endsWith('.github.io')){
+    const owner = h.split('.')[0];
+    const parts = location.pathname.split('/').filter(Boolean);
+    const repo = parts.length ? parts[0] : owner + '.github.io';
+    return {owner, repo, branch:'main'};
+  }
+  return null;
+})();
+const DATA_FILE = 'projets.json';
+const RAW_URL = GITHUB
+  ? 'https://raw.githubusercontent.com/' + GITHUB.owner + '/' + GITHUB.repo + '/' + GITHUB.branch + '/' + DATA_FILE
+  : DATA_FILE;
+
+/* données de secours (utilisées si projets.json est inaccessible) */
+const projets = [
+  {nom:'Portfolio 3D', cover:'projets/gamedia-1.png', imgs:['projets/gamedia-2.png','projets/gamedia-3.png','projets/gamedia-4.png'], g:'linear-gradient(135deg,#7ec8e3,#2d6a8e)', desc:'Un portfolio immersif en WebGL où l’on navigue dans une pièce en 3D. Animations fluides et scène interactive.', tags:['Three.js','React','GSAP']},
+  {nom:'TaskFlow', cover:'projets/taskflow.png', imgs:['projets/taskflow-1.png','projets/taskflow-2.png','projets/taskflow-3.png'], g:'linear-gradient(135deg,#a8e6a3,#3f9b6d)', desc:'Application de gestion de tâches collaborative avec drag & drop, thèmes et synchronisation en temps réel.', tags:['React','Node','Socket.io']},
+  {nom:'Nova Shop', cover:'projets/nova-shop.png', imgs:['projets/nova-shop-1.png','projets/nova-shop-2.png','projets/nova-shop-3.png'], g:'linear-gradient(135deg,#ffd28a,#e08740)', desc:'Boutique e-commerce complète : panier, filtres, espace client et paiement simulateur.', tags:['Next.js','Stripe','Tailwind']},
+  {nom:'Météo Live', cover:'projets/meteo-live.png', imgs:['projets/meteo-live-1.png','projets/meteo-live-2.png','projets/meteo-live-3.png'], g:'linear-gradient(135deg,#bda8f0,#5a4a9e)', desc:'Application météo avec prévisions sur 7 jours, cartes interactives et alertes personnalisées.', tags:['Vue','API REST','Chart.js']},
+  {nom:'Data Dashboard', cover:'projets/data-dashboard.png', imgs:['projets/data-dashboard-1.png','projets/data-dashboard-2.png','projets/data-dashboard-3.png'], g:'linear-gradient(135deg,#8fe0d4,#2e8c86)', desc:'Tableau de bord analytics avec graphiques dynamiques, filtres avancés et export CSV.', tags:['React','D3.js','PostgreSQL']},
+  {nom:'Mon App Mobile', cover:'projets/app-mobile.png', imgs:['projets/app-mobile-1.png','projets/app-mobile-2.png','projets/app-mobile-3.png'], g:'linear-gradient(135deg,#ffb6cf,#c65d86)', desc:'Application mobile de suivi d’habitudes avec notifications, statistiques et mode hors-ligne.', tags:['React Native','Expo','SQLite']},
+  {nom:'Bot Discord', cover:'projets/bot-discord.png', imgs:['projets/bot-discord-1.png','projets/bot-discord-2.png','projets/bot-discord-3.png'], g:'linear-gradient(135deg,#9fb8ff,#4a5fa8)', desc:'Bot Discord multi-fonctions : modération, musique, sondages et commandes personnalisées.', tags:['Python','discord.py','MongoDB']},
+  {nom:'Générateur de frigo', cover:'projets/generateur-frigo.png', imgs:['projets/generateur-frigo-1.png','projets/generateur-frigo-2.png','projets/generateur-frigo-3.png'], g:'linear-gradient(135deg,#d6e6ee,#8aa7b8)', desc:'Un générateur de portfolios loufoques où chaque section devient un post-it collé sur un frigo.', tags:['HTML','CSS','JavaScript']}
+];
+
+const grid = document.getElementById('grid');
+
+/* === ALIMENTS : vraies photos fournies, fond transparent === */
+const foods = [
+  {src:'asset/aliment-confiture.png', alt:'Confiture', h:104},
+  {src:'asset/aliment-yaourt.png', alt:'Yaourt', h:92},
+  {src:'asset/aliment-carottes.png', alt:'Carottes', h:82},
+  {src:'asset/aliment-saucisson.png', alt:'Saucisson', h:82}
+];
+
+function addFood(shelf, seed){
+  const row = document.createElement('div');
+  row.className = 'food-row';
+  const pattern = window.innerWidth < 700 ? [0, 1, 2, 3] : [0, 1, 3, 2, 0, 1, 3];
+  pattern.forEach((idx, k) => {
+    const f = foods[idx];
+    const img = document.createElement('img');
+    img.className = 'food';
+    img.src = f.src;
+    img.alt = f.alt;
+    img.style.height = (f.h * (k % 3 === 0 ? 1 : .9)) + 'px';
+    img.loading = 'lazy';
+    row.appendChild(img);
+  });
+  shelf.appendChild(row);
+}
+
+/* galerie : grandes images + flèches de chaque côté */
+let galerieImages = [];
+let galerieIndex = 0;
+function afficherImage(){
+  const img = document.getElementById('mImg');
+  img.src = galerieImages[galerieIndex];
+  img.style.display = 'block';
+  document.getElementById('gCount').textContent = (galerieIndex + 1) + ' / ' + galerieImages.length;
+}
+function openProject(p){
+  galerieImages = (p.imgs && p.imgs.length) ? p.imgs : [p.imgs ? p.imgs[0] : ''];
+  galerieIndex = 0;
+  document.getElementById('mImg').alt = p.nom;
+  document.getElementById('mTitle').textContent = p.nom;
+  document.getElementById('mDesc').textContent = p.desc;
+  document.getElementById('mTags').innerHTML = p.tags.map(t => '<span class="tag">' + t + '</span>').join('');
+  afficherImage();
+  document.getElementById('overlay').classList.add('show');
+}
+document.getElementById('gPrev').addEventListener('click', e => {
+  e.stopPropagation();
+  galerieIndex = (galerieIndex - 1 + galerieImages.length) % galerieImages.length;
+  afficherImage();
+});
+document.getElementById('gNext').addEventListener('click', e => {
+  e.stopPropagation();
+  galerieIndex = (galerieIndex + 1) % galerieImages.length;
+  afficherImage();
+});
+
+function makeCard(p, i){
+  const card = document.createElement('div');
+  card.className = 'project';
+  card.style.animationDelay = (i * .06) + 's';
+  card.innerHTML = `
+    <div class="open-ico">↗</div>
+    <button class="card-delete" title="Supprimer ce projet">✕</button>
+    <div class="thumb" style="--g:${p.g}"><img src="${p.cover || p.imgs[0]}" alt="${p.nom}" loading="lazy" onerror="this.style.display='none'"></div>
+    <div class="body">
+      <h3>${p.nom}</h3>
+      <p>${p.desc}</p>
+      <div>${p.tags.map(t => '<span class="tag">' + t + '</span>').join('')}</div>
+    </div>`;
+  card.addEventListener('click', () => openProject(p));
+  card.querySelector('.card-delete').addEventListener('click', e => {
+    e.stopPropagation();
+    if (!adminUnlocked) return;
+    const idx = projets.indexOf(p);
+    if (idx > -1) projets.splice(idx, 1);
+    saveProjets().then(() => render()).catch(e => alert(e.message));
+  });
+  return card;
+}
+
+/* une étagère après chaque ligne de projets */
+function render(){
+  const cols = window.innerWidth >= 1050 ? 4 : window.innerWidth >= 620 ? 2 : 1;
+  grid.style.setProperty('--cols', cols);
+  grid.innerHTML = '';
+  projets.forEach((p, i) => {
+    grid.appendChild(makeCard(p, i));
+    if ((i + 1) % cols === 0 && i + 1 < projets.length){
+      const shelf = document.createElement('div');
+      shelf.className = 'shelf-line';
+      addFood(shelf, i / cols | 0);
+      grid.appendChild(shelf);
+    }
+  });
+}
+render();
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(render, 180);
+});
+
+const overlay = document.getElementById('overlay');
+overlay.addEventListener('click', e => {
+  if (e.target === overlay || e.target.closest('[data-close]')) overlay.classList.remove('show');
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    overlay.classList.remove('show');
+    document.getElementById('loginOverlay').classList.remove('show');
+    document.getElementById('adminOverlay').classList.remove('show');
+  }
+});
+
+/* ============================================================
+   ADMIN — code : chaos2009@
+   ============================================================ */
+const CODE = 'chaos2009@';
+let adminUnlocked = false;
+let editingIndex = -1;
+const loginOverlay = document.getElementById('loginOverlay');
+const adminOverlay = document.getElementById('adminOverlay');
+const adminBar = document.getElementById('adminBar');
+const adminLock = document.getElementById('adminLock');
+let adminToken = sessionStorage.getItem('admin-gh-token') || '';
+
+adminLock.addEventListener('click', () => {
+  if (adminUnlocked) logout();
+  else loginOverlay.classList.add('show');
+});
+document.getElementById('adminLogin').addEventListener('click', () => {
+  if (document.getElementById('adminCode').value.trim() !== CODE){
+    alert('Code incorrect ❌');
+    return;
+  }
+  const token = document.getElementById('adminToken').value.trim();
+  if (GITHUB && !token){
+    alert('Il faut le token GitHub pour enregistrer les modifications.');
+    return;
+  }
+  if (token) adminToken = token;
+  if (adminToken) sessionStorage.setItem('admin-gh-token', adminToken);
+  adminUnlocked = true;
+  loginOverlay.classList.remove('show');
+  adminLock.textContent = '🔓';
+  adminLock.classList.add('unlocked');
+  adminBar.classList.add('show');
+  document.body.classList.add('admin-mode');
+  render();
+});
+function logout(){
+  adminUnlocked = false;
+  adminLock.textContent = '🔒';
+  adminLock.classList.remove('unlocked');
+  adminBar.classList.remove('show');
+  document.body.classList.remove('admin-mode');
+  render();
+}
+document.getElementById('adminLogout').addEventListener('click', logout);
+
+/* charge les projets partagés (GitHub Pages ou fichier local) */
+async function loadProjets(){
+  if (!GITHUB){
+    try {
+      const s = localStorage.getItem('admin-projets');
+      if (s) projets.push(...JSON.parse(s));
+    } catch(e){}
+  }
+  try {
+    const r = await fetch(RAW_URL + '?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (Array.isArray(data) && data.length){
+      projets.length = 0;
+      projets.push(...data);
+    }
+  } catch(e){
+    console.warn('projets.json inaccessible, données intégrées utilisées', e);
+  }
+  render();
+}
+
+/* enregistre TOUS les projets dans le dépôt : tout le monde les verra */
+async function saveProjets(){
+  if (!GITHUB){
+    try { localStorage.setItem('admin-projets', JSON.stringify(projets)); } catch(e){}
+    return;
+  }
+  const url = 'https://api.github.com/repos/' + GITHUB.owner + '/' + GITHUB.repo + '/contents/' + DATA_FILE;
+  const headers = {
+    'Authorization': 'Bearer ' + adminToken,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json'
+  };
+  let sha = null;
+  try {
+    const meta = await fetch(url + '?ref=' + GITHUB.branch, {headers});
+    if (meta.ok) sha = (await meta.json()).sha;
+  } catch(e){}
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(projets, null, 2))));
+  const body = {message:'Mise à jour des projets (admin)', content, branch:GITHUB.branch};
+  if (sha) body.sha = sha;
+  const res = await fetch(url, {method:'PUT', headers, body:JSON.stringify(body)});
+  if (!res.ok){
+    const txt = await res.text();
+    throw new Error('Enregistrement impossible (' + res.status + ') : ' + txt.slice(0,180));
+  }
+}
+function splitList(v){
+  return v.split(',').map(s => s.trim()).filter(Boolean);
+}
+function openAdminForm(index){
+  editingIndex = index;
+  const p = index >= 0 ? projets[index] : null;
+  document.getElementById('adminTitle').textContent = p ? 'Modifier le projet' : 'Ajouter un projet';
+  document.getElementById('fNom').value = p ? p.nom : '';
+  document.getElementById('fDesc').value = p ? p.desc : '';
+  document.getElementById('fCover').value = p ? (p.cover || '') : '';
+  document.getElementById('fImgs').value = p ? (p.imgs || []).join(', ') : '';
+  document.getElementById('fTags').value = p ? (p.tags || []).join(', ') : '';
+  adminOverlay.classList.add('show');
+}
+document.getElementById('adminAdd').addEventListener('click', () => openAdminForm(-1));
+document.getElementById('adminSave').addEventListener('click', async () => {
+  const nom = document.getElementById('fNom').value.trim();
+  if (!nom){ alert('Donne un nom au projet'); return; }
+  const obj = {
+    nom: nom,
+    desc: document.getElementById('fDesc').value.trim(),
+    cover: document.getElementById('fCover').value.trim(),
+    imgs: splitList(document.getElementById('fImgs').value),
+    g: 'linear-gradient(135deg,#7fa8bd,#3f6a80)',
+    tags: splitList(document.getElementById('fTags').value)
+  };
+  if (!obj.imgs.length && obj.cover) obj.imgs = [obj.cover];
+  if (!obj.imgs.length) obj.imgs = ['projets/gamedia-4.png'];
+  if (editingIndex >= 0) projets[editingIndex] = obj;
+  else projets.push(obj);
+  try {
+    await saveProjets();
+    adminOverlay.classList.remove('show');
+    render();
+  } catch(e){
+    alert(e.message);
+  }
+});
+
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => {
+    if (e.target === o) o.classList.remove('show');
+  });
+});
+
+loadProjets();
+</script>
+</body>
+</html>

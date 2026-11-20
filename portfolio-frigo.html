@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio sur le frigo — wirotik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Dancing+Script:wght@400;600;700&family=Kalam:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#23211e;
+  --font-hand:'Caveat',cursive;
+  --font-title:'Dancing Script','Permanent Marker',cursive;
+  --steel-1:#d3d8dc;
+  --steel-2:#f4f6f7;
+  --steel-3:#b9c0c6;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html,body{height:100%}
+body{
+  font-family:var(--font-hand);
+  overflow:hidden;
+  background:#8f8577;
+  color:var(--ink);
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* ============================================================
+   CUISINE (décor)
+   ============================================================ */
+.kitchen{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 6%, rgba(255,229,186,.18), transparent 72%),
+    radial-gradient(ellipse 50% 60% at 8% 90%, rgba(120,140,150,.10), transparent 70%),
+    linear-gradient(180deg,#262727 0%,#1e1f20 55%,#111213 100%);
+}
+/* panneaux muraux discrets, ambiance haut de gamme */
+.kitchen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 190px),
+    linear-gradient(180deg,rgba(255,255,255,.035),transparent 60%);
+  opacity:.8;
+}
+/* grain de la pierre / mur */
+.kitchen::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:var(--noise);
+  background-size:220px;
+  opacity:.07;
+  mix-blend-mode:multiply;
+  pointer-events:none;
+}
+/* plan de travail + ombre au sol */
+.floor-shadow,.plinthe{display:none}
+
+/* lumière ambiante chaude */
+.ambient-light{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 20% 10%,rgba(255,231,190,.13),transparent 45%);
+  pointer-events:none;
+}
+
+/* ============================================================
+   LE FRIGO
+   ============================================================ */
+.scene{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+.fridge{
+  position:relative;
+  width:min(88vw,760px);
+  height:124vh;
+  border-radius:12px 12px 8px 8px;
+  background:linear-gradient(105deg,#0b0c0d 0%,#3a3d40 4%,#151719 50%,#3a3d40 96%,#090a0b 100%);
+  padding:8px;
+  box-shadow:
+    inset 0 1px 1px rgba(255,220,160,.28),
+    inset 0 -4px 10px rgba(0,0,0,.8),
+    0 30px 70px rgba(0,0,0,.75),
+    0 10px 25px rgba(0,0,0,.55),
+    0 0 0 1px rgba(214,184,124,.35);
+  perspective:1500px;
+}
+/* intérieur du frigo, révélé quand la porte s'ouvre */
+.interior{
+  position:absolute; inset:8px;
+  border-radius:6px;
+  background:linear-gradient(180deg,#f2f7fa 0%,#d7e2e8 55%,#b9c8d1 100%);
+  box-shadow:inset 0 0 34px rgba(20,40,60,.28),inset 0 8px 0 rgba(255,255,255,.6);
+  overflow:hidden;
+  z-index:0;
+}
+.interior::before{ /* lumière intérieure */
+  content:"";position:absolute;left:0;right:0;top:0;height:70px;
+  background:radial-gradient(ellipse at 50% 0,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);
+}
+.interior::after{ /* séparateur central entre les deux compartiments */
+  content:"";position:absolute;left:50%;top:0;bottom:0;width:12px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,#a9b6bf,#f2f7fa 40%,#cbd7de 70%,#9eacb5);
+  box-shadow:0 0 8px rgba(0,0,0,.25);
+}
+.shelf{
+  position:absolute;left:5%;right:5%;height:9px;border-radius:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(150,170,185,.75));
+  box-shadow:0 5px 8px rgba(0,0,0,.18),inset 0 -2px 2px rgba(0,0,0,.12);
+}
+.shelf::before{content:"";position:absolute;left:0;right:0;top:9px;height:5px;background:linear-gradient(180deg,rgba(70,90,105,.18),transparent)}
+.s1{top:26%}.s2{top:48%}.s3{top:70%}
+.aliment-img{
+  position:absolute;left:var(--x);top:var(--y);
+  height:var(--h,60px);width:auto;
+  filter:drop-shadow(2px 4px 4px rgba(0,0,0,.3));
+  transform:rotate(var(--rot,0deg));
+}
+
+/* flèche qui apparaît quand le frigo est ouvert */
+.inside-arrow{
+  position:absolute;left:50%;top:42%;
+  transform:translate(-50%,-50%) scale(.7);
+  width:96px;height:96px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.85);
+  background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.98),rgba(214,231,242,.9));
+  box-shadow:0 10px 26px rgba(0,0,0,.32),inset 0 2px 8px rgba(255,255,255,.9);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;cursor:pointer;z-index:9;
+  transition:opacity .55s ease,transform .55s cubic-bezier(.2,.9,.3,1.3),box-shadow .25s,border-color .25s;
+}
+.inside-arrow svg{width:48px;height:48px;fill:#4f6878;transition:transform .25s}
+.inside-arrow .arrow-label{
+  position:absolute;bottom:108%;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-family:var(--font-hand);
+  font-size:22px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8);
+}
+.fridge.open .inside-arrow{
+  opacity:1;pointer-events:auto;
+  transform:translate(-50%,-50%) scale(1);
+  animation:arrowPulse 2.4s ease-in-out infinite;
+}
+.inside-arrow:hover{
+  border-color:#d9b46a;
+  box-shadow:0 0 0 5px rgba(217,180,106,.45),0 14px 32px rgba(0,0,0,.45);
+  transform:translate(-50%,-50%) scale(1.1);
+  animation:none;
+}
+.inside-arrow:hover svg{transform:translateX(4px)}
+@keyframes arrowPulse{0%,100%{box-shadow:0 10px 26px rgba(0,0,0,.32)}50%{box-shadow:0 0 0 7px rgba(255,255,255,.18),0 12px 30px rgba(0,0,0,.35)}}
+/* la porte ouverte laisse passer les clics vers la flèche */
+.fridge.open .door{pointer-events:none}
+.fridge.open .door .note,.fridge.open .door .polaroid{pointer-events:auto}
+.fridge::before{display:none}
+/* DEUX PORTES : chaque moitié pivote sur son bord extérieur */
+.door{
+  position:relative;
+  width:100%; height:100%;
+  border-radius:9px;
+  overflow:visible;
+  z-index:2;
+  transform-style:preserve-3d;
+}
+.door-half{
+  position:absolute; top:0; bottom:0;
+  width:50%;
+  background:url('asset/frigo1-door.jpg') 0 center / 200% 100% no-repeat;
+  transition:transform .8s cubic-bezier(.2,.75,.2,1),box-shadow .8s ease;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.4),inset 0 -10px 18px rgba(0,0,0,.35);
+  z-index:1;
+}
+.door-half.left{
+  left:0;
+  border-radius:9px 2px 2px 9px;
+  transform-origin:left center;
+}
+.door-half.right{
+  right:0;
+  background-position:right center;
+  border-radius:2px 9px 9px 2px;
+  transform-origin:right center;
+}
+.fridge.open .door-half.left,
+.fridge.open .notes-half.left{transform:rotateY(-42deg)}
+.fridge.open .door-half.right,
+.fridge.open .notes-half.right{transform:rotateY(42deg)}
+.fridge.open .door-half.left{box-shadow:14px 6px 30px rgba(0,0,0,.55)}
+.fridge.open .door-half.right{box-shadow:-14px 6px 30px rgba(0,0,0,.55)}
+/* la photo contient déjà joint, reflets et grain : on masque les anciens calques */
+.gasket,.door::after,.door::before{display:none}
+
+/* poignée */
+.handle{
+  position:absolute;
+  right:30px; top:10%; height:80%; width:17px;
+  border-radius:10px;
+  background:linear-gradient(90deg,#7d6743 0%,#f7e3b7 22%,#c7a66b 45%,#fff2cd 62%,#9d8052 88%,#675335 100%);
+  box-shadow:
+    3px 5px 10px rgba(0,0,0,.65),
+    inset 1px 0 1px rgba(255,246,220,.85),
+    inset -1px 0 2px rgba(0,0,0,.5);
+  z-index:3;
+  cursor:grab;
+}
+.handle:active{cursor:grabbing}
+.handle::before,.handle::after{ /* entretoises */
+  content:"";
+  position:absolute; left:50%; transform:translateX(-50%);
+  width:32px; height:14px;
+  background:linear-gradient(180deg,#e9d09a,#8d7448);
+  border-radius:3px;
+  box-shadow:0 2px 5px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,246,220,.8);
+  z-index:-1;
+}
+.handle::before{top:14%}
+.handle::after{bottom:14%}
+
+/* badge de marque */
+.badge{
+  position:absolute;
+  left:5%; top:1.8%;
+  padding:5px 18px 6px;
+  border-radius:2px;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:14px;
+  letter-spacing:.5em;
+  color:#e2c68d;
+  border:1px solid rgba(226,198,141,.35);
+  background:linear-gradient(180deg,#2c2e30,#121416);
+  box-shadow:
+    inset 0 1px 1px rgba(255,235,190,.12),
+    inset 0 -1px 2px rgba(0,0,0,.6),
+    0 2px 4px rgba(0,0,0,.5);
+  text-shadow:0 1px 1px #000;
+  z-index:2;
+}
+
+/* distributeur (petit détail réaliste) */
+.dispenser{
+  position:absolute; right:11px; top:9%;
+  width:28px; height:82px;
+  border-radius:4px;
+  background:linear-gradient(90deg,#4a4640,#b9a47c,#514c44);
+  box-shadow:inset 0 0 0 2px rgba(10,10,10,.65),0 1px 4px rgba(0,0,0,.6);
+  z-index:2;
+}
+.dispenser::before{
+  content:"";position:absolute;left:50%;top:12px;transform:translateX(-50%);
+  width:12px;height:20px;border-radius:2px;
+  background:linear-gradient(180deg,#33383d,#14181b);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.8);
+}
+.dispenser::after{
+  content:"";position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+  width:14px;height:5px;border-radius:3px;
+  background:#4a5055;box-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+/* la photo fournit déjà poignée, distributeur et badge */
+.dispenser,.badge,.handle{display:none}
+
+/* ============================================================
+   POST-IT
+   ============================================================ */
+.notes{position:absolute;inset:0;z-index:5;transform-style:preserve-3d}
+.notes-half{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;
+  transition:transform .8s cubic-bezier(.2,.75,.2,1);
+  pointer-events:none; /* sinon les calques transparents bloquent les notes */
+}
+.notes-half .note,.notes-half .polaroid{pointer-events:auto}
+.notes-half.left{transform-origin:left center}
+.notes-half.right{transform-origin:right center}
+.fridge.open .note:hover:not(.dragging){transform:rotate(var(--r))}
+
+.note{
+  position:absolute;
+  width:var(--w,152px);
+  height:var(--h,152px);
+  padding:0;
+  font-size:var(--fs,22px);
+  color:var(--ink);
+  cursor:grab;
+  touch-action:none;
+  filter:drop-shadow(4px 9px 9px rgba(0,0,0,.55));
+  transform:rotate(var(--r,0deg));
+  transform-origin:50% 0%;
+  transition:filter .25s ease, transform .25s cubic-bezier(.2,.9,.3,1.3);
+  z-index:var(--z,10);
+}
+.note.dragging{
+  cursor:grabbing;
+  filter:drop-shadow(11px 22px 20px rgba(0,0,0,.6));
+  transform:rotate(calc(var(--r,0deg) + 2deg)) scale(1.04);
+  transition:none;
+}
+.note:hover:not(.dragging){
+  filter:drop-shadow(8px 16px 14px rgba(0,0,0,.6));
+  transform:rotate(calc(var(--r,0deg) * .3)) scale(1.035) translateY(-2px);
+  z-index:100 !important;
+}
+
+/* le papier : VRAIE photo de post-it (texture extraite), recolorée en CSS */
+.paper{
+  position:relative;
+  width:100%; height:100%;
+  padding:1.25em 1.05em .9em;
+  border-radius:2px;
+}
+.paper-photo{
+  position:absolute; inset:0;
+  background-image:var(--tex,url('asset/postit-texture.png'));
+  background-position:center center;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  filter:hue-rotate(var(--hue,0deg)) saturate(var(--sat,1)) brightness(var(--bri,1));
+  pointer-events:none;
+  z-index:0;
+}
+.paper > h2,.paper > h3,.paper > p,.paper > ul,.paper > hr{
+  position:relative; z-index:1;
+}
+
+/* magnets */
+.magnet{
+  position:absolute;
+  top:-.36em; left:50%;
+  width:1.2em; height:1.2em;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#fff 0%,var(--mag,#e5453b) 26%,var(--magd,#9c1f18) 100%);
+  box-shadow:
+    -3px 6px 6px rgba(0,0,0,.45),
+    inset -2px -3px 4px rgba(0,0,0,.3),
+    inset 2px 2px 3px rgba(255,255,255,.85),
+    0 0 0 1px rgba(0,0,0,.15);
+  z-index:4;
+}
+.magnet::after{ /* reflet */
+  content:"";position:absolute;left:22%;top:16%;width:30%;height:20%;
+  border-radius:50%;background:rgba(255,255,255,.85);
+  filter:blur(1px);transform:rotate(-25deg);
+}
+.pin-note .magnet{display:none}
+.magnet.m2{left:auto;right:.65em;transform:none;top:-.32em;width:1em;height:1em;--mag:#3f7fd6;--magd:#1e4c94}
+.magnet.clip{
+  width:.55em;height:1.4em;border-radius:.3em;
+  background:linear-gradient(90deg,#9aa0a6,#f2f4f5,#8e959b);
+  box-shadow:-2px 4px 5px rgba(0,0,0,.4),inset 1px 0 1px rgba(255,255,255,.8);
+}
+.magnet.clip::after{display:none}
+
+/* typographie manuscrite — tailles relatives à --fs */
+.note h2{
+  font-family:var(--font-title);
+  font-size:1.18em;line-height:1.05;font-weight:700;
+  margin-bottom:.3em;letter-spacing:.3px;
+  color:#1c1a18;
+}
+.note h3{
+  font-family:var(--font-hand);
+  font-size:1.45em;line-height:1;font-weight:700;
+  margin-bottom:.22em;
+}
+.note p,.note li{
+  font-family:var(--font-hand);
+  font-size:1em;line-height:1.12;font-weight:600;
+}
+.note ul{list-style:none;margin:.1em 0 0}
+.note li{padding-left:.8em;position:relative;margin:.05em 0}
+.note li::before{content:"✓";position:absolute;left:0;color:#2e7d4f;font-weight:700}
+.inline-edit{
+  font-family:var(--font-hand);font-size:1em;line-height:1.12;
+  border:none;background:transparent;width:100%;color:inherit;
+  outline:none;resize:none;overflow:hidden;
+}
+.note .small{font-size:.84em;opacity:.82}
+.note .marker{font-family:var(--font-title);font-size:.78em}
+.note .red{color:#b5392f}
+.note .blue{color:#275b8c}
+.note hr{border:none;border-top:1.5px dashed rgba(0,0,0,.22);margin:8px 0}
+.note .scribble{position:absolute;pointer-events:none;opacity:.6}
+.note .tape{
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-3deg);
+  width:64px;height:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(230,225,210,.5));
+  box-shadow:0 1px 2px rgba(0,0,0,.18);
+  opacity:.75;
+}
+.note .tag{
+  display:inline-block;font-family:var(--font-title);font-size:10px;
+  border:1.5px solid rgba(0,0,0,.5);border-radius:2px;
+  padding:0 4px;transform:rotate(-4deg);margin-top:4px;
+}
+
+/* petit "post-it empilé" derrière une note */
+.stack-shadow{
+  position:absolute;inset:0;
+  background:var(--c2);
+  border-radius:2px;
+  transform:rotate(5deg) translate(5px,5px);
+  opacity:.65;
+  box-shadow:2px 4px 5px rgba(0,0,0,.2);
+  z-index:-1;
+}
+
+/* ============================================================
+   PHOTO POLAROID épinglée
+   ============================================================ */
+.polaroid{
+  position:absolute;
+  width:140px;padding:9px 9px 32px;
+  background:linear-gradient(180deg,#fff,#f0eee8);
+  box-shadow:2px 6px 9px rgba(0,0,0,.35);
+  transform:rotate(var(--r,-6deg));
+  z-index:var(--z,12);
+  cursor:grab;touch-action:none;
+}
+.polaroid .photo{
+  width:100%;height:112px;
+  background:linear-gradient(160deg,#6fa8c9,#c9e3ee 45%,#f2e2c4 46%,#c99b6e);
+  position:relative;overflow:hidden;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.2);
+}
+.polaroid .photo svg{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:98px;height:92px}
+.polaroid .photo img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;z-index:1;pointer-events:none;
+}
+.polaroid .caption{
+  position:absolute;bottom:6px;left:0;right:0;text-align:center;
+  font-family:var(--font-hand);font-size:20px;color:#333;
+}
+.polaroid .magnet{top:-10px}
+
+/* ============================================================
+   INDICE & MODALE
+   ============================================================ */
+.hint{
+  position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
+  font-family:var(--font-hand);font-size:20px;color:rgba(240,215,165,.9);
+  text-shadow:0 2px 4px rgba(0,0,0,.8);
+  white-space:nowrap;pointer-events:none;z-index:20;
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+.overlay{
+  position:fixed;inset:0;z-index:900;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(20,18,15,.72);
+  backdrop-filter:blur(4px);
+  padding:20px;
+}
+.overlay.show{display:flex;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.sheet{
+  position:relative;
+  width:min(92vw,560px);max-height:86vh;overflow:auto;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.5),transparent 30%),
+    linear-gradient(160deg,var(--c1,#f7e37f),var(--c2,#f2cf4e));
+  padding:38px 34px 30px;
+  border-radius:2px;
+  box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.5);
+  transform:rotate(-1deg);
+  animation:pop .35s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes pop{from{transform:scale(.85) rotate(4deg);opacity:0}to{transform:scale(1) rotate(-1deg);opacity:1}}
+.sheet::before{ /* bande adhésive */
+  content:"";position:absolute;left:0;right:0;top:0;height:26px;
+  background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(0,0,0,.04));
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.sheet .magnet{top:-12px;left:50%;width:30px;height:30px}
+.sheet h2{
+  font-family:var(--font-title);font-size:32px;line-height:1.05;
+  margin-bottom:6px;
+}
+.sheet .sub{font-family:var(--font-hand);font-size:23px;color:#555;margin-bottom:14px}
+.sheet p{font-family:var(--font-hand);font-size:22px;line-height:1.15;margin-bottom:10px}
+.sheet .tech{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.sheet .tech span{
+  font-family:var(--font-title);font-size:12px;
+  background:rgba(255,255,255,.45);border:1.5px solid rgba(0,0,0,.45);
+  padding:3px 8px;border-radius:20px;
+}
+.sheet .lien{
+  display:inline-block;margin-top:10px;font-family:var(--font-title);
+  font-size:15px;color:#1d4e80;border-bottom:2px solid rgba(29,78,128,.5);
+  text-decoration:none;cursor:pointer;
+}
+.close{
+  position:absolute;right:16px;top:14px;
+  width:34px;height:34px;border:none;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,#fff,#e5453b 30%,#9c1f18);
+  color:#fff;font-size:20px;font-family:var(--font-hand);
+  cursor:pointer;box-shadow:-2px 4px 6px rgba(0,0,0,.4),inset 2px 2px 3px rgba(255,255,255,.6);
+  z-index:5;
+}
+
+@media (max-width:560px){
+  .fridge{width:96vw;height:130vh;border-radius:12px;padding:10px}
+  .interior{inset:10px}
+  .note{--fs:19px}
+  .polaroid{width:112px}
+  .polaroid .photo{height:86px}
+  .polaroid .caption{font-size:16px}
+  .dispenser{display:none}
+  .handle{right:16px;width:12px}
+  .hint{font-size:15px;bottom:4px}
+}
+</style>
+</head>
+<body>
+
+<div class="kitchen">
+  <div class="ambient-light"></div>
+  <div class="plinthe"></div>
+  <div class="floor-shadow"></div>
+
+  <div class="scene">
+    <div class="fridge" id="fridge">
+      <div class="interior" aria-hidden="true">
+        <div class="shelf s1"></div>
+        <div class="shelf s2"></div>
+        <div class="shelf s3"></div>
+        <img class="aliment-img" src="asset/aliment-confiture.png" alt="Confiture" style="--x:36%;--y:18%;--h:72px">
+        <img class="aliment-img" src="asset/aliment-yaourt.png" alt="Yaourt" style="--x:55%;--y:21%;--h:50px">
+        <img class="aliment-img" src="asset/aliment-saucisson.png" alt="Saucisson" style="--x:38%;--y:43%;--h:40px">
+        <img class="aliment-img" src="asset/aliment-confiture.png" alt="Confiture" style="--x:58%;--y:41%;--h:64px">
+        <img class="aliment-img" src="asset/aliment-yaourt.png" alt="Yaourt" style="--x:38%;--y:63%;--h:50px">
+        <img class="aliment-img" src="asset/aliment-carottes.png" alt="Carottes" style="--x:48%;--y:64%;--h:34px">
+        <div class="inside-arrow" id="insideArrow" title="Entrer dans le frigo">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4l-1.4 1.4L16.2 11H4v2h12.2l-5.6 5.6L12 20l8-8z"/></svg>
+          <span class="arrow-label">Entrer dans le frigo</span>
+        </div>
+      </div>
+      <div class="door" id="door">
+        <div class="door-half left"></div>
+        <div class="door-half right"></div>
+        <div class="gasket"></div>
+        <div class="dispenser"></div>
+        <div class="badge">NOVA</div>
+        <div class="handle" id="handle" title="Ouvre la porte 👀"></div>
+
+        <div class="notes" id="notes">
+
+          <div class="notes-half left">
+          <!-- BIENVENUE -->
+          <div class="note" style="--hue:-65deg;--c1:#ffc0cb;--c2:#f7a8b8;--r:-5deg;--z:14;left:5%;top:5%;--w:165px;--h:180px">
+            <span class="magnet" style="--mag:#e5453b;--magd:#9c1f18"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h3>Salut ! 👋</h3>
+              <p class="small">Bienvenue sur<br>mon portfolio...<br><span class="red">(version frigo !)</span></p>
+            </div>
+          </div>
+
+          <!-- À PROPOS -->
+          <div class="note" style="--tex:url('asset/postit-texture-2.png');--c1:#f9e79f;--c2:#f5d96a;--r:3deg;--z:11;left:32%;top:3%;--w:195px;--h:215px">
+            <span class="magnet m2"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>À PROPOS</h2>
+              <p>Je suis <b>wirotik</b>,<br>dev créatif<br>monteur/miniamaker<br>et bien plus<br>📍France 66</p>
+            </div>
+          </div>
+
+          <!-- COMPÉTENCES -->
+          <div class="note" style="--hue:165deg;--c1:#bfe3f5;--c2:#a3d3ef;--r:-2deg;--z:12;left:6%;top:27%;--w:185px;--h:215px">
+            <span class="magnet" style="--mag:#f2c14e;--magd:#b8860b"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>SKILLS</h2>
+              <ul>
+                <li>HTML / CSS</li>
+                <li>Photoshop</li>
+                <li>Premiere pro</li>
+                <li>Python</li>
+                <li>JavaScript</li>
+                <li>UI / UX design</li>
+
+              </ul>
+            </div>
+          </div>
+
+          <!-- PROJETS (cliquable) -->
+          <div class="note" style="--tex:url('asset/postit-texture-2.png');--hue:68deg;--sat:.62;--c1:#c8e9ac;--c2:#aede87;--r:4deg;--z:13;left:33%;top:25%;--w:195px;--h:210px">
+            <span class="magnet" style="--mag:#7a4fd0;--magd:#4a2c8f"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>PROJETS ⭐</h2>
+              <p>Clique sur le frigo<br>pour voir toutes<br>mes réalisations !</p>
+              </ul>
+            </div>
+          </div>
+
+          </div><!-- /notes-half left -->
+
+          <div class="notes-half right">
+          <!-- PHOTO -->
+          <div class="polaroid" style="--r:-8deg;--z:16;left:64%;top:4%">
+            <span class="magnet" style="--mag:#e5453b;--magd:#9c1f18"></span>
+            <div class="photo">
+              <img id="polaroidPhoto" class="polaroid-photo" src="asset/photo.png" alt="Ma photo" draggable="false">
+              <svg viewBox="0 0 80 76" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="28" r="18" fill="#e8b98f"/>
+                <path d="M22 26 Q40 2 58 26 Q50 16 40 16 Q30 16 22 26" fill="#3b2b20"/>
+                <circle cx="33" cy="28" r="2" fill="#3b2b20"/><circle cx="47" cy="28" r="2" fill="#3b2b20"/>
+                <path d="M34 36 Q40 41 46 36" stroke="#a85b4a" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M12 76 Q14 52 40 50 Q66 52 68 76Z" fill="#4a6fa5"/>
+              </svg>
+            </div>
+            <span class="caption">moi, un lundi ☕</span>
+          </div>
+
+          </div><!-- /notes-half right -->
+
+          <div class="notes-half left">
+          <!-- CONTACT (cliquable) -->
+          <div class="note" style="--hue:-22deg;--fs:20px;--c1:#ffd9a0;--c2:#ffc47a;--r:-4deg;--z:15;left:7%;top:55%;--w:190px;--h:175px" data-modal="contact">
+            <span class="magnet clip"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>CONTACT </h2>
+              <p class="small">✉️ chaos.warinlhermite66<br>@gmail.com<br>insta:_chaos.w<br>💻 github.com/wirotik</p>
+              <a class="blue marker" style="text-decoration:none" href="mailto:chaos.warinlhermite66@gmail.com?subject=Bonjour%20depuis%20le%20frigo&amp;body=Salut%20%F0%9F%91%8B%20%21">↗ écris-moi !</a>
+            </div>
+          </div>
+
+          <!-- EXPÉRIENCE -->
+          <div class="note" style="--hue:220deg;--sat:.72;--fs:20px;--c1:#e3d4f7;--c2:#d2bdf0;--r:3deg;--z:12;left:33%;top:53%;--w:190px;--h:180px">
+            <span class="magnet" style="--mag:#4dc3a6;--magd:#1f8a70"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>EXPÉRIENCE</h2>
+              <p class="small">2024 → aujourd'hui<br>Dev Projet<br>Montages Vidéo<br>Miniature YouTube</p>
+            </div>
+          </div>
+
+          </div><!-- /notes-half left -->
+
+          <div class="notes-half right">
+          <!-- MÉMO rigolo -->
+          <div class="note pin-note" style="--tex:url('asset/postit-texture-1.png');--c1:#fdf3a8;--c2:#f4e36a;--fs:18px;--r:-7deg;--z:10;left:64%;top:26%;--w:140px;--h:150px">
+            <span class="magnet m2"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h3>Rappel 📌</h3>
+              <p class="small">Répondre aux<br>mails...<br><span class="red">(demain !)</span></p>
+            </div>
+          </div>
+
+          </div><!-- /notes-half right -->
+
+          <div class="notes-half left">
+          <!-- CV -->
+          <div class="note" style="--tex:url('asset/postit-texture-2.png');--hue:-12deg;--sat:.7;--bri:1.12;--c1:#f5e8ca;--c2:#ead4a4;--r:2deg;--z:11;left:7%;top:74%;--w:190px;--h:165px">
+            <span class="magnet" style="--mag:#c9a86a;--magd:#7d6743"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>CV 📄</h2>
+              <p class="small">Tout mon parcours,<br>mes diplômes &amp; mes<br>réalisations.</p>
+              <p class="blue marker">↗ sur demande !</p>
+            </div>
+          </div>
+
+          </div><!-- /notes-half left -->
+
+          <div class="notes-half right">
+          <!-- CITATION -->
+          <div class="note pin-note" style="--tex:url('asset/postit-texture-1.png');--hue:-72deg;--fs:19px;--c1:#f9dce6;--c2:#f2bdd0;--r:5deg;--z:10;left:65%;top:46%;--w:145px;--h:150px">
+            <span class="magnet clip"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h3 style="font-size:1.05em">Citation ✨</h3>
+              <p class="small">« Le code est<br>un art. »</p>
+              <p class="small red">— 3h du mat'</p>
+            </div>
+          </div>
+
+          </div><!-- /notes-half right -->
+
+          <div class="notes-half left">
+          <!-- LOISIRS -->
+          <div class="note" style="--tex:url('asset/postit-texture-2.png');--hue:95deg;--sat:.8;--bri:1.05;--fs:20px;--c1:#d7f0e4;--c2:#bce5d3;--r:-3deg;--z:12;left:33%;top:72%;--w:200px;--h:180px">
+            <span class="magnet m2"></span>
+            <div class="paper"><div class="paper-photo"></div>
+              <h2>PASSIONS</h2>
+              <ul>
+                <li>informatique 🖥️</li>
+                <li>jeux vidéo 🎮</li>
+                <li>jeu de rôle 🎲</li>
+                <li>Japon 🌸</li>
+              </ul>
+            </div>
+          </div>
+          </div><!-- /notes-half left -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">✦ Glisse les post-it · Clique pour ouvrir · Clique sur le frigo ✦</div>
+</div>
+
+<!-- MODALE CONTACT -->
+<div class="overlay" id="overlayContact">
+  <div class="sheet" style="--c1:#ffd9a0;--c2:#ffc47a">
+    <button class="close" data-close>✕</button>
+    <span class="magnet" style="--mag:#e5453b;--magd:#9c1f18"></span>
+    <h2>ON PARLE ? 💬</h2>
+    <div class="sub">un projet, une idée, un service ?</div>
+    <p>Écris-moi, je réponds vite.</p>
+    <p><b>Email :</b> chaos.warinlhermite66@gmail.com</p>
+    <p><b>Instagram :</b> _chaos.w</p>
+    <p><b>GitHub :</b> https://github.com/wirotik</p>
+    <a class="lien" href="mailto:chaos.warinlhermite66@gmail.com?subject=Bonjour%20depuis%20le%20frigo&amp;body=Salut%20%F0%9F%91%8B%20%21">→ envoyer un mail</a>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   PHOTO DU POLAROID — modifie uniquement le nom du fichier ici
+   (les visiteurs ne peuvent pas la changer)
+   ============================================================ */
+const PHOTO_SRC = 'asset/photo.png';
+const polaroidPhoto = document.getElementById('polaroidPhoto');
+polaroidPhoto.src = PHOTO_SRC;
+polaroidPhoto.addEventListener('error', () => { polaroidPhoto.style.display = 'none'; });
+
+/* ============================================================
+   GLISSER-DÉPOSER DES POST-IT
+   ============================================================ */
+const door = document.getElementById('door');
+const draggables = document.querySelectorAll('.note, .polaroid');
+let topZ = 30;
+
+draggables.forEach(el => {
+  let dragging = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+  el.addEventListener('pointerdown', e => {
+    if (e.target.closest('button,a')) return;
+    dragging = true; moved = false;
+    el.setPointerCapture(e.pointerId);
+    const r = el.getBoundingClientRect();
+    ox = e.clientX - r.left;
+    oy = e.clientY - r.top;
+    sx = e.clientX; sy = e.clientY;
+    el.style.zIndex = ++topZ;
+    el.classList.add('dragging');
+  });
+
+  el.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 5) moved = true;
+    const d = door.getBoundingClientRect();
+    let x = e.clientX - d.left - ox;
+    let y = e.clientY - d.top - oy;
+    x = Math.max(-10, Math.min(x, d.width - el.offsetWidth + 10));
+    y = Math.max(-10, Math.min(y, d.height - el.offsetHeight + 10));
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+  });
+
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.classList.remove('dragging');
+    if (!moved && el.dataset.modal) openModal(el.dataset.modal);
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+});
+
+/* ============================================================
+   MODALES
+   ============================================================ */
+function openModal(name){
+  const o = document.getElementById('overlay' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (o) o.classList.add('show');
+}
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => {
+    if (e.target === o || e.target.closest('[data-close]')) o.classList.remove('show');
+  });
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.overlay.show').forEach(o => o.classList.remove('show'));
+});
+
+/* ============================================================
+   CLIC SUR LE FRIGO (hors post-it) = OUVERTURE DE LA PORTE
+   ============================================================ */
+const fridge = document.getElementById('fridge');
+let isOpen = false;
+fridge.addEventListener('click', e => {
+  if (e.target.closest('.note, .polaroid, .inside-arrow')) return;
+  isOpen = !isOpen;
+  fridge.classList.toggle('open', isOpen);
+});
+document.getElementById('insideArrow').addEventListener('click', e => {
+  e.stopPropagation();
+  window.location.href = 'interieur-frigo.html';
+});
+/* recalc automatique si la fenêtre change : on replace les notes en % */
+window.addEventListener('resize', () => {
+  // les notes déjà déplacées restent where they are (px), c'est voulu.
+});
+</script>
+</body>
+</html>
