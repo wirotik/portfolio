@@ -323,10 +323,7 @@ body.admin-mode .card-delete{display:block}
     <div class="body">
       <h2>Accès admin 🔒</h2>
       <label>Code d'accès</label>
-      <input type="text" id="adminCode" placeholder="chaos2009@">
-      <label>Token GitHub (une seule fois)</label>
-      <input type="password" id="adminToken" placeholder="ghp_... ou token fine-grained">
-      <p style="font-size:16px;color:#557184;margin-top:8px">Le token sert à enregistrer les projets dans le dépôt. Il reste dans cet onglet uniquement.</p>
+      <input type="password" id="adminCode" placeholder="••••••••">
       <button class="btn" id="adminLogin">Connexion</button>
     </div>
   </div>
@@ -365,13 +362,14 @@ body.admin-mode .card-delete{display:block}
    projets sont lus/écrits dans projets.json grâce à l'API GitHub.
    En local (file://), on retombe sur le fichier projets.json à côté.
    ============================================================ */
+const BRANCH = 'main'; // ← passe à 'master' si ta branche s'appelle master
 const GITHUB = (function(){
   const h = location.hostname;
   if (h.endsWith('.github.io')){
     const owner = h.split('.')[0];
     const parts = location.pathname.split('/').filter(Boolean);
     const repo = parts.length ? parts[0] : owner + '.github.io';
-    return {owner, repo, branch:'main'};
+    return {owner, repo, branch:BRANCH};
   }
   return null;
 })();
@@ -468,7 +466,8 @@ function makeCard(p, i){
     if (!adminUnlocked) return;
     const idx = projets.indexOf(p);
     if (idx > -1) projets.splice(idx, 1);
-    saveProjets().then(() => render()).catch(e => alert(e.message));
+    saveProjets();
+    render();
   });
   return card;
 }
@@ -510,31 +509,28 @@ window.addEventListener('keydown', e => {
 /* ============================================================
    ADMIN — code : chaos2009@
    ============================================================ */
-const CODE = 'chaos2009@';
+/* le mot de passe n'apparaît pas en clair dans le code : seule son empreinte est stockée */
+function hashCode(s){
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h;
+}
+const CODE_HASH = 1848170950; // empreinte du mot de passe
 let adminUnlocked = false;
 let editingIndex = -1;
 const loginOverlay = document.getElementById('loginOverlay');
 const adminOverlay = document.getElementById('adminOverlay');
 const adminBar = document.getElementById('adminBar');
 const adminLock = document.getElementById('adminLock');
-let adminToken = sessionStorage.getItem('admin-gh-token') || '';
-
 adminLock.addEventListener('click', () => {
   if (adminUnlocked) logout();
   else loginOverlay.classList.add('show');
 });
 document.getElementById('adminLogin').addEventListener('click', () => {
-  if (document.getElementById('adminCode').value.trim() !== CODE){
+  if (hashCode(document.getElementById('adminCode').value.trim()) !== CODE_HASH){
     alert('Code incorrect ❌');
     return;
   }
-  const token = document.getElementById('adminToken').value.trim();
-  if (GITHUB && !token){
-    alert('Il faut le token GitHub pour enregistrer les modifications.');
-    return;
-  }
-  if (token) adminToken = token;
-  if (adminToken) sessionStorage.setItem('admin-gh-token', adminToken);
   adminUnlocked = true;
   loginOverlay.classList.remove('show');
   adminLock.textContent = '🔓';
@@ -553,14 +549,8 @@ function logout(){
 }
 document.getElementById('adminLogout').addEventListener('click', logout);
 
-/* charge les projets partagés (GitHub Pages ou fichier local) */
+/* charge les projets : fichier partagé, puis écrasement par les modifs locales éventuelles */
 async function loadProjets(){
-  if (!GITHUB){
-    try {
-      const s = localStorage.getItem('admin-projets');
-      if (s) projets.push(...JSON.parse(s));
-    } catch(e){}
-  }
   try {
     const r = await fetch(RAW_URL + '?t=' + Date.now());
     if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -572,35 +562,25 @@ async function loadProjets(){
   } catch(e){
     console.warn('projets.json inaccessible, données intégrées utilisées', e);
   }
+  /* les modifications faites depuis l'admin restent prioritaires dans ce navigateur */
+  try {
+    const local = localStorage.getItem('admin-projets-full');
+    if (local){
+      const data = JSON.parse(local);
+      if (Array.isArray(data)){
+        projets.length = 0;
+        projets.push(...data);
+      }
+    }
+  } catch(e){}
   render();
 }
 
-/* enregistre TOUS les projets dans le dépôt : tout le monde les verra */
-async function saveProjets(){
-  if (!GITHUB){
-    try { localStorage.setItem('admin-projets', JSON.stringify(projets)); } catch(e){}
-    return;
-  }
-  const url = 'https://api.github.com/repos/' + GITHUB.owner + '/' + GITHUB.repo + '/contents/' + DATA_FILE;
-  const headers = {
-    'Authorization': 'Bearer ' + adminToken,
-    'Accept': 'application/vnd.github+json',
-    'Content-Type': 'application/json'
-  };
-  let sha = null;
-  try {
-    const meta = await fetch(url + '?ref=' + GITHUB.branch, {headers});
-    if (meta.ok) sha = (await meta.json()).sha;
-  } catch(e){}
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(projets, null, 2))));
-  const body = {message:'Mise à jour des projets (admin)', content, branch:GITHUB.branch};
-  if (sha) body.sha = sha;
-  const res = await fetch(url, {method:'PUT', headers, body:JSON.stringify(body)});
-  if (!res.ok){
-    const txt = await res.text();
-    throw new Error('Enregistrement impossible (' + res.status + ') : ' + txt.slice(0,180));
-  }
+/* enregistre les projets dans ce navigateur */
+function saveProjets(){
+  try { localStorage.setItem('admin-projets-full', JSON.stringify(projets)); } catch(e){}
 }
+
 function splitList(v){
   return v.split(',').map(s => s.trim()).filter(Boolean);
 }
@@ -631,13 +611,9 @@ document.getElementById('adminSave').addEventListener('click', async () => {
   if (!obj.imgs.length) obj.imgs = ['projets/gamedia-4.png'];
   if (editingIndex >= 0) projets[editingIndex] = obj;
   else projets.push(obj);
-  try {
-    await saveProjets();
-    adminOverlay.classList.remove('show');
-    render();
-  } catch(e){
-    alert(e.message);
-  }
+  saveProjets();
+  adminOverlay.classList.remove('show');
+  render();
 });
 
 document.querySelectorAll('.overlay').forEach(o => {
